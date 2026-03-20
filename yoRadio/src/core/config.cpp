@@ -549,7 +549,7 @@ void Config::resetSystem(const char *val, uint8_t clientId){
 void Config::setDefaults() {
   store.config_set = 4262;
   store.version = CONFIG_VERSION;
-  store.volume = 12;
+  store.volume = V5A_DEFAULT_VOLUME;
   store.balance = 0;
   store.trebble = 0;
   store.middle = 0;
@@ -582,7 +582,7 @@ void Config::setDefaults() {
   store._reserved = 0;
   store.lastSdStation = 0;
   store.sdsnuffle = false;
-  store.volsteps = 1;
+  store.volsteps = V5A_BUTTON_VOLUME_STEP;
   store.encacc = 200;
   store.play_mode = 0;
   store.irtlp = 35;
@@ -1047,4 +1047,3 @@ void Config::bootInfo() {
   if(SDC_CS!=255) BOOTLOG("SD:\t\t%d", SDC_CS);
   BOOTLOG("------------------------------------------------");
 }
-
