@@ -38,8 +38,7 @@ void audio_bitrate(const char *info)
   netserver.requestOnChange(BITRATE, 0);
 }
 
-bool printable(const char *info) {
-  (void)info;
+bool printable(const char * /*info*/) {
   return true;
 }
 

@@ -234,8 +234,23 @@ The connection tables are located here https://github.com/e2002/yoradio#connecti
 #ifndef BAT_BEEP_CHANNEL
   #define BAT_BEEP_CHANNEL      7
 #endif
+#ifndef BAT_BEEP_RESOLUTION
+  #define BAT_BEEP_RESOLUTION   8
+#endif
+#ifndef BAT_BEEP_PULSE_MS
+  #define BAT_BEEP_PULSE_MS     120
+#endif
+#ifndef BAT_BEEP_STAGES
+  #define BAT_BEEP_STAGES       8
+#endif
 #ifndef BAT_BEEP_INTERVAL_MS
   #define BAT_BEEP_INTERVAL_MS  60000
+#endif
+#ifndef BAT_ADC_READ_INTERVAL_MS
+  #define BAT_ADC_READ_INTERVAL_MS 1000
+#endif
+#ifndef BAT_ADC_MIN_VALID
+  #define BAT_ADC_MIN_VALID     1     // filter out zero/invalid ADC reads
 #endif
 
 /*        TOUCH SCREEN            */

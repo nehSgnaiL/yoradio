@@ -14,6 +14,8 @@ int lpId = -1;
 unsigned long lowBatLastBeepAt = 0;
 uint8_t lowBatBeepStage = 0;
 unsigned long lowBatBeepStamp = 0;
+unsigned long lowBatAdcStamp = 0;
+int lowBatAdcValue = 0;
 
 #if DSP_MODEL==DSP_DUMMY
 #define DUMMYDISPLAY
@@ -142,25 +144,30 @@ void loopControls() {
   if(SDC_CS==255 && display.mode()==LOST) return;
   if(ctrls_on_loop) ctrls_on_loop();
   if (BAT_LOW_ADC != 255 && BAT_BEEP_PIN != 255) {
-    int bat = analogRead(BAT_LOW_ADC);
     unsigned long now = millis();
-    if (bat > 0 && bat <= BAT_LOW_LEVEL && now - lowBatLastBeepAt >= BAT_BEEP_INTERVAL_MS && lowBatBeepStage == 0) {
+    if (now - lowBatAdcStamp >= BAT_ADC_READ_INTERVAL_MS) {
+      lowBatAdcStamp = now;
+      lowBatAdcValue = analogRead(BAT_LOW_ADC);
+    }
+    bool isBatteryLow = lowBatAdcValue >= BAT_ADC_MIN_VALID && lowBatAdcValue <= BAT_LOW_LEVEL;
+    bool shouldStartBeep = now - lowBatLastBeepAt >= BAT_BEEP_INTERVAL_MS && lowBatBeepStage == 0;
+    if (isBatteryLow && shouldStartBeep) {
       lowBatLastBeepAt = now;
       lowBatBeepStamp = now;
       lowBatBeepStage = 1;
-      ledcSetup(BAT_BEEP_CHANNEL, BAT_BEEP_FREQ, 8);
+      ledcSetup(BAT_BEEP_CHANNEL, BAT_BEEP_FREQ, BAT_BEEP_RESOLUTION);
       ledcAttachPin(BAT_BEEP_PIN, BAT_BEEP_CHANNEL);
       ledcWriteTone(BAT_BEEP_CHANNEL, BAT_BEEP_FREQ);
     }
-    if (lowBatBeepStage > 0 && now - lowBatBeepStamp >= 120) {
+    if (lowBatBeepStage > 0 && now - lowBatBeepStamp >= BAT_BEEP_PULSE_MS) {
       lowBatBeepStamp = now;
-      if (lowBatBeepStage % 2 == 1) {
+      if (lowBatBeepStage & 1) {
         ledcWriteTone(BAT_BEEP_CHANNEL, 0);
       } else {
         ledcWriteTone(BAT_BEEP_CHANNEL, BAT_BEEP_FREQ);
       }
       lowBatBeepStage++;
-      if (lowBatBeepStage > 8) {
+      if (lowBatBeepStage > BAT_BEEP_STAGES) {
         lowBatBeepStage = 0;
         ledcWriteTone(BAT_BEEP_CHANNEL, 0);
       }
