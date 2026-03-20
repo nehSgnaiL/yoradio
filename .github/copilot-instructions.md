@@ -11,3 +11,4 @@
 - Default volume is `170` (`V5A_DEFAULT_VOLUME`).
 - Prefer UTF-8 safe handling for playlist/station text (Chinese text must pass through without conversion loss).
 - Update all the markdown files of this repository in time.
+- Be concise and do not generate too many words to save the context window. Commit and push in time.
