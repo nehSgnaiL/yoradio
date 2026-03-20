@@ -3,7 +3,7 @@ import os
 import subprocess
 
 
-def _boot_app0_path(build_dir):
+def _boot_app0_path(build_dir, env):
     local_copy = os.path.join(build_dir, "boot_app0.bin")
     if os.path.exists(local_copy):
         return local_copy
@@ -15,7 +15,7 @@ def _boot_app0_path(build_dir):
 def after_build(source, target, env):
     build_dir = env.subst("$BUILD_DIR")
     merged = os.path.join(build_dir, "merged-yoradio.bin")
-    boot_app0 = _boot_app0_path(build_dir)
+    boot_app0 = _boot_app0_path(build_dir, env)
 
     cmd = [
         "uv", "run", "python", "-m", "esptool",
