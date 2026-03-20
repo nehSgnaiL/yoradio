@@ -35,7 +35,7 @@
   #define BAT_BEEP_PULSE_MS     120
 #endif
 #ifndef BAT_BEEP_STAGES
-  #define BAT_BEEP_STAGES       3     // number of "beep" tones in one reminder sequence
+  #define BAT_BEEP_STAGES       3     // "beep beep beep" low-battery reminder sequence
 #endif
 #ifndef BAT_BEEP_INTERVAL_MS
   #define BAT_BEEP_INTERVAL_MS  60000
