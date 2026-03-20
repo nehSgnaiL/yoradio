@@ -70,6 +70,10 @@ void setupOTA(){
 
 void setup() {
   Serial.begin(115200);
+  if(BAT_OWR!=255){
+    pinMode(BAT_OWR, OUTPUT);
+    digitalWrite(BAT_OWR, HIGH);
+  }
   if(REAL_LEDBUILTIN!=255) pinMode(REAL_LEDBUILTIN, OUTPUT);
   if (yoradio_on_setup) yoradio_on_setup();
   pm.on_setup();
