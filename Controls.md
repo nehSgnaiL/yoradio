@@ -14,6 +14,13 @@
 ### Buttons
 Up to 5 buttons can be connected to the device. Three buttons are enough to control it.
 
+#### V5A simplified controls
+- BTN_UP: volume +10
+- BTN_DOWN: volume -10
+- BTN_CENTER: disabled
+- Encoder left/right: previous/next station
+- Encoder button: disabled
+
 Button actions:
 - BTN_LEFT\
  click: volume down\
