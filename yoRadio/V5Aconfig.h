@@ -9,6 +9,35 @@
   #define V5A_BUTTON_VOLUME_STEP 10
 #endif
 
+/*        V5A SPI BUS SELECTION                               */
+/*  V5A uses VSPI pins for the ST7789 display:               */
+/*    SCLK=18, MOSI=19, CS=22  (VSPI native pins on ESP32)  */
+#ifndef V5A_SPI_CLK
+  #define V5A_SPI_CLK   18
+#endif
+#ifndef V5A_SPI_MOSI
+  #define V5A_SPI_MOSI  19
+#endif
+#ifndef V5A_SPI_SS
+  #define V5A_SPI_SS    22
+#endif
+/* Use VSPI hardware bus instead of HSPI so pins 18/19 work  */
+#ifndef V5A_USE_VSPI
+  #define V5A_USE_VSPI  true
+#endif
+
+/*        CHINESE FONT SUPPORT                               */
+/*  Enable U8g2 Chinese font rendering for station names     */
+#ifndef V5A_USE_CHINESE_FONT
+  #define V5A_USE_CHINESE_FONT true
+#endif
+
+/*        CHINA LOCALE DEFAULTS                              */
+/*  Default timezone offset for China Standard Time (CST)   */
+#ifndef V5A_DEFAULT_TZ_HOUR
+  #define V5A_DEFAULT_TZ_HOUR   8
+#endif
+
 /*        BATTERY                  */
 #ifndef BAT_OWR
   #define BAT_OWR               255   // keep system power enabled when battery is connected

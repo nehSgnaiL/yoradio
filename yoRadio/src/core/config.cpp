@@ -17,6 +17,10 @@
 #endif
 #include <cstddef>
 
+#if (DSP_HSPI || TS_HSPI || VS_HSPI)
+extern SPIClass SPI2;
+#endif
+
 #if DSP_MODEL==DSP_DUMMY
 #define DUMMYDISPLAY
 #endif
@@ -51,6 +55,10 @@ bool Config::_isFSempty() {
 
 void Config::init() {
   EEPROM.begin(EEPROM_SIZE);
+#if defined(V5A_USE_VSPI) && V5A_USE_VSPI && (DSP_HSPI || TS_HSPI)
+  /* Initialize SPI2 on VSPI pins used by V5A (CLK=18, MISO=NC, MOSI=19, SS=22) */
+  SPI2.begin(V5A_SPI_CLK, -1, V5A_SPI_MOSI, V5A_SPI_SS);
+#endif
   sdResumePos = 0;
   screensaverTicks = 0;
   screensaverPlayingTicks = 0;
@@ -559,14 +567,14 @@ void Config::setDefaults() {
   store.lastSSID = 0;
   store.audioinfo = false;
   store.smartstart = 2;
-  store.tzHour = 3;
+  store.tzHour = V5A_DEFAULT_TZ_HOUR;
   store.tzMin = 0;
   store.timezoneOffset = 0;
 
   store.vumeter=false;
   store.softapdelay=0;
-  store.flipscreen=false;
-  store.invertdisplay=false;
+  store.flipscreen=true;
+  store.invertdisplay=true;
   store.numplaylist=false;
   store.fliptouch=false;
   store.dbgtouch=false;

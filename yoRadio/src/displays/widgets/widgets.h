@@ -131,6 +131,41 @@ class ScrollWidget: public TextWidget {
     void _reset();
 };
 
+#if defined(V5A_USE_CHINESE_FONT) && V5A_USE_CHINESE_FONT
+/* ScrollWidgetCHS: scrolling widget that renders UTF-8/Chinese text using
+   U8g2_for_Adafruit_GFX instead of the GFX built-in font, so Chinese
+   characters in station names and song metadata display correctly. */
+class ScrollWidgetCHS: public TextWidget {
+  public:
+    ScrollWidgetCHS(){}
+    ScrollWidgetCHS(const char* separator, ScrollConfig conf, uint16_t fgcolor, uint16_t bgcolor);
+    ~ScrollWidgetCHS();
+    using Widget::init;
+    void init(const char* separator, ScrollConfig conf, uint16_t fgcolor, uint16_t bgcolor);
+    void loop();
+    void setText(const char* txt);
+    void setText(const char* txt, const char *format);
+  private:
+    char *_sep;
+    char *_window;
+    int16_t _x;
+    bool _doscroll;
+    uint8_t _scrolldelta;
+    uint16_t _scrolltime;
+    uint32_t _scrolldelay;
+    uint16_t _sepwidth, _startscrolldelay;
+    uint8_t _charWidth;
+  private:
+    void _setTextParams();
+    void _calcX();
+    void _draw();
+    bool _checkIsScrollNeeded();
+    bool _checkDelay(int m, uint32_t &tstamp);
+    void _clear();
+    void _reset();
+};
+#endif
+
 class SliderWidget: public Widget {
   public:
     SliderWidget(){}
@@ -259,11 +294,17 @@ class PlayListWidget: public Widget {
   public:
     using Widget::init;
     void init(ScrollWidget* current);
+#if defined(V5A_USE_CHINESE_FONT) && V5A_USE_CHINESE_FONT
+    void initCHS(ScrollWidgetCHS* current);
+#endif
     void drawPlaylist(uint16_t currentItem);
     inline uint16_t itemHeight(){ return _plItemHeight; }
     inline uint16_t currentTop(){ return _plYStart+_plCurrentPos*_plItemHeight; }
   private:
     ScrollWidget* _current;
+#if defined(V5A_USE_CHINESE_FONT) && V5A_USE_CHINESE_FONT
+    ScrollWidgetCHS* _currentCHS = nullptr;
+#endif
     uint16_t _plItemHeight, _plTtemsCount, _plCurrentPos;
     int _plYStart;
     uint8_t _fillPlMenu(int from, uint8_t count);
