@@ -106,6 +106,8 @@ https://e2002.github.io/docs/myoptions-generator.html
 Don't edit the options.h! \
 Hardware is adjustment in the **[myoptions.h](examples/myoptions.h)** file.
 
+For V5A-specific adjustable defaults (volume step/default and battery low-beep reminder tuning), use **[yoRadio/V5Aconfig.h](yoRadio/V5Aconfig.h)**.
+
 **Important!**
 You must choose between I2S DAC and VS1053 by disabling the second module in the settings:
 ````c++
