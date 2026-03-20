@@ -241,7 +241,7 @@ The connection tables are located here https://github.com/e2002/yoradio#connecti
   #define BAT_BEEP_PULSE_MS     120
 #endif
 #ifndef BAT_BEEP_STAGES
-  #define BAT_BEEP_STAGES       8
+  #define BAT_BEEP_STAGES       3     // number of "beep" tones in one reminder sequence
 #endif
 #ifndef BAT_BEEP_INTERVAL_MS
   #define BAT_BEEP_INTERVAL_MS  60000
