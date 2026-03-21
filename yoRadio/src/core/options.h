@@ -198,6 +198,9 @@ The connection tables are located here https://github.com/e2002/yoradio#connecti
 #ifndef DEFAULT_VOLUME_LEVEL
   #define DEFAULT_VOLUME_LEVEL    170
 #endif
+#ifndef FORCE_DEFAULT_VOLUME_ON_START
+  #define FORCE_DEFAULT_VOLUME_ON_START  true
+#endif
 #ifndef MAX_VOLUME_LEVEL
   #define MAX_VOLUME_LEVEL        254
 #endif

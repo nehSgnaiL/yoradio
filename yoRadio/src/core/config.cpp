@@ -61,6 +61,9 @@ void Config::init() {
 #endif
   eepromRead(EEPROM_START, store);
   if (store.config_set != 4262) setDefaults();
+  #if FORCE_DEFAULT_VOLUME_ON_START
+    store.volume = DEFAULT_VOLUME_LEVEL;
+  #endif
   backupLastStation = store.lastStation;
   if(store.play_mode==80) store.play_mode=0b100;
   sdSnuffle = bitRead(store.play_mode, 2);
