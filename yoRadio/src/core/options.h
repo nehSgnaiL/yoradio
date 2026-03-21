@@ -198,8 +198,11 @@ The connection tables are located here https://github.com/e2002/yoradio#connecti
 #ifndef DEFAULT_VOLUME_LEVEL
   #define DEFAULT_VOLUME_LEVEL    170
 #endif
+#ifndef MAX_VOLUME_LEVEL
+  #define MAX_VOLUME_LEVEL        254
+#endif
 #ifndef LOW_BATTERY_THRESHOLD
-  #define LOW_BATTERY_THRESHOLD  3.55f
+  #define LOW_BATTERY_THRESHOLD  3.55f // single-cell 18650 Li-ion low-battery reminder threshold
 #endif
 #ifndef LOW_BATTERY_BEEP_INTERVAL_MS
   #define LOW_BATTERY_BEEP_INTERVAL_MS  60000UL
@@ -207,8 +210,26 @@ The connection tables are located here https://github.com/e2002/yoradio#connecti
 #ifndef LOW_BATTERY_BEEP_PIN
   #define LOW_BATTERY_BEEP_PIN    255
 #endif
+#ifndef LOW_BATTERY_BEEP_CHANNEL
+  #define LOW_BATTERY_BEEP_CHANNEL 0
+#endif
+#ifndef LOW_BATTERY_BEEP_TONE_HIGH
+  #define LOW_BATTERY_BEEP_TONE_HIGH 1200
+#endif
+#ifndef LOW_BATTERY_BEEP_TONE_LOW
+  #define LOW_BATTERY_BEEP_TONE_LOW 900
+#endif
+#ifndef LOW_BATTERY_BEEP_ON_MS
+  #define LOW_BATTERY_BEEP_ON_MS   100
+#endif
+#ifndef LOW_BATTERY_BEEP_OFF_MS
+  #define LOW_BATTERY_BEEP_OFF_MS   80
+#endif
 #ifndef BAT_PWR_PIN
   #define BAT_PWR_PIN               4
+#endif
+#ifndef SYSTEM_PWR_PIN
+  #define SYSTEM_PWR_PIN            2
 #endif
 
 /*        TOUCH SCREEN            */
@@ -465,7 +486,7 @@ The connection tables are located here https://github.com/e2002/yoradio#connecti
 #endif
 
 #define EN  1
-#define ZH  2
+#define ZH  2 // replaces previous RU slot to keep config compatibility
 #ifndef L10N_LANGUAGE
   #define L10N_LANGUAGE EN
 #endif

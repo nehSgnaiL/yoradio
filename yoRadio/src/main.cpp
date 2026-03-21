@@ -75,14 +75,19 @@ float GetBATVoltage()
 void lowBatteryBeep()
 {
 #if LOW_BATTERY_BEEP_PIN != 255
-  ledcAttachPin(LOW_BATTERY_BEEP_PIN, 0);
-  const uint16_t tones[] = {1200, 900, 1200, 900};
+  ledcAttachPin(LOW_BATTERY_BEEP_PIN, LOW_BATTERY_BEEP_CHANNEL);
+  const uint16_t tones[] = {
+    LOW_BATTERY_BEEP_TONE_HIGH,
+    LOW_BATTERY_BEEP_TONE_LOW,
+    LOW_BATTERY_BEEP_TONE_HIGH,
+    LOW_BATTERY_BEEP_TONE_LOW
+  };
   for (uint8_t i = 0; i < 4; i++)
   {
-    ledcWriteTone(0, tones[i]);
-    delay(100);
-    ledcWriteTone(0, 0);
-    delay(80);
+    ledcWriteTone(LOW_BATTERY_BEEP_CHANNEL, tones[i]);
+    delay(LOW_BATTERY_BEEP_ON_MS);
+    ledcWriteTone(LOW_BATTERY_BEEP_CHANNEL, 0);
+    delay(LOW_BATTERY_BEEP_OFF_MS);
   }
   ledcDetachPin(LOW_BATTERY_BEEP_PIN);
 #endif
@@ -95,8 +100,8 @@ void setup()
 
   pinMode(BAT_PWR_PIN, OUTPUT);
   digitalWrite(BAT_PWR_PIN, HIGH);
-  pinMode(2, OUTPUT);
-  digitalWrite(2, HIGH);
+  pinMode(SYSTEM_PWR_PIN, OUTPUT);
+  digitalWrite(SYSTEM_PWR_PIN, HIGH);
   setCpuFrequencyMhz(240);
   adc1_config_width(ADC_WIDTH_BIT_12);
   adc1_config_channel_atten(BATT_ADC, ADC_ATTEN_DB_11);
@@ -145,7 +150,7 @@ void loop()
 {
   telnet.loop();
 #ifdef BATT_ADC
-  if (millis() - lastLowBatteryBeep > LOW_BATTERY_BEEP_INTERVAL_MS)
+  if ((unsigned long)(millis() - lastLowBatteryBeep) > LOW_BATTERY_BEEP_INTERVAL_MS)
   {
     lastLowBatteryBeep = millis();
     if (GetBATVoltage() <= LOW_BATTERY_THRESHOLD)

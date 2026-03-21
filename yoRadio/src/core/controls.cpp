@@ -11,8 +11,6 @@ long encOldPosition = 0;
 long enc2OldPosition = 0;
 int lpId = -1;
 
-#define VOLUME_MAX 254
-
 #define ISPUSHBUTTONS BTN_LEFT != 255 || BTN_CENTER != 255 || BTN_RIGHT != 255 || ENC_BTNB != 255 || BTN_UP != 255 || BTN_DOWN != 255 || ENC2_BTNB != 255 || BTN_MODE != 255
 #if ISPUSHBUTTONS
 #include "../OneButton/OneButton.h"
@@ -168,7 +166,7 @@ void loopControls()
 #endif
 }
 #if ENC_BTNL != 255 || ENC2_BTNL != 255
-void encodersLoop(yoEncoder *enc, bool first)
+void encodersLoop(yoEncoder *enc)
 {
   if (network.status != CONNECTED && network.status != SDREADY)
     return;
@@ -178,13 +176,11 @@ void encodersLoop(yoEncoder *enc, bool first)
   if (encoderDelta != 0)
   {
 #if defined(DUMMYDISPLAY) && !defined(USE_NEXTION)
-    (void)first;
     if (encoderDelta > 0)
       player.next();
     else
       player.prev();
 #else
-    (void)first;
     if (encoderDelta > 0)
       player.next();
     else
@@ -197,14 +193,14 @@ void encodersLoop(yoEncoder *enc, bool first)
 #if ENC_BTNL != 255
 void encoder1Loop()
 {
-  encodersLoop(&encoder, true);
+  encodersLoop(&encoder);
 }
 #endif
 
 #if ENC2_BTNL != 255
 void encoder2Loop()
 {
-  encodersLoop(&encoder2, false);
+  encodersLoop(&encoder2);
 }
 #endif
 
@@ -490,8 +486,8 @@ void onBtnDuringLongPress(int id)
     case EVT_BTNUP:
     {
       int nv = config.store.volume + EASY_VOLUME_STEP;
-      if (nv > VOLUME_MAX)
-        nv = VOLUME_MAX;
+      if (nv > MAX_VOLUME_LEVEL)
+        nv = MAX_VOLUME_LEVEL;
       player.setVol((uint8_t)nv);
       break;
     }
@@ -574,8 +570,8 @@ void onBtnClick(int id)
   case EVT_BTNUP:
   {
     int nv = config.store.volume + EASY_VOLUME_STEP;
-    if (nv > VOLUME_MAX)
-      nv = VOLUME_MAX;
+    if (nv > MAX_VOLUME_LEVEL)
+      nv = MAX_VOLUME_LEVEL;
     player.setVol((uint8_t)nv);
     break;
   }
