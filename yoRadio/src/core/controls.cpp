@@ -166,9 +166,8 @@ void loopControls()
 #endif
 }
 #if ENC_BTNL != 255 || ENC2_BTNL != 255
-void encodersLoop(yoEncoder *enc, bool first)
+void encodersLoop(yoEncoder *enc, bool /*first*/)
 {
-  (void)first;
   if (network.status != CONNECTED && network.status != SDREADY)
     return;
   if (display.mode() == LOST)
