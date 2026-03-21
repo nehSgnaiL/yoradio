@@ -11,6 +11,8 @@ long encOldPosition = 0;
 long enc2OldPosition = 0;
 int lpId = -1;
 
+#define VOLUME_MAX 254
+
 #define ISPUSHBUTTONS BTN_LEFT != 255 || BTN_CENTER != 255 || BTN_RIGHT != 255 || ENC_BTNB != 255 || BTN_UP != 255 || BTN_DOWN != 255 || ENC2_BTNB != 255 || BTN_MODE != 255
 #if ISPUSHBUTTONS
 #include "../OneButton/OneButton.h"
@@ -175,42 +177,18 @@ void encodersLoop(yoEncoder *enc, bool first)
   int8_t encoderDelta = enc->encoderChanged();
   if (encoderDelta != 0)
   {
-    uint8_t encBtnState = digitalRead(first ? ENC_BTNB : ENC2_BTNB);
 #if defined(DUMMYDISPLAY) && !defined(USE_NEXTION)
-    first = first ? (first && encBtnState) : (!encBtnState);
-    if (first)
-    {
-      int nv = config.store.volume + encoderDelta;
-      if (nv < 0)
-        nv = 0;
-      if (nv > 254)
-        nv = 254;
-      player.setVol((uint8_t)nv);
-    }
+    (void)first;
+    if (encoderDelta > 0)
+      player.next();
     else
-    {
-      if (encoderDelta > 0)
-        player.next();
-      else
-        player.prev();
-    }
+      player.prev();
 #else
-    if (first)
-    {
-      controlsEvent(encoderDelta > 0, encoderDelta);
-    }
+    (void)first;
+    if (encoderDelta > 0)
+      player.next();
     else
-    {
-      if (encBtnState == HIGH && display.mode() == PLAYER)
-      {
-        display.putRequest(NEWMODE, STATIONS);
-        while (display.mode() != STATIONS)
-        {
-          delay(10);
-        }
-      }
-      controlsEvent(encoderDelta > 0, encoderDelta);
-    }
+      player.prev();
 #endif
   }
 }
@@ -433,7 +411,6 @@ void onBtnLongPressStart(int id)
 #if defined(DUMMYDISPLAY) && !defined(USE_NEXTION)
     break;
 #endif
-    display.putRequest(NEWMODE, display.mode() == PLAYER ? STATIONS : PLAYER);
     break;
   }
   case EVT_ENC2BTNB:
@@ -441,7 +418,6 @@ void onBtnLongPressStart(int id)
 #if defined(DUMMYDISPLAY) && !defined(USE_NEXTION)
     break;
 #endif
-    display.putRequest(NEWMODE, display.mode() == PLAYER ? VOL : PLAYER);
     break;
   }
   case EVT_BTNMODE:
@@ -468,12 +444,6 @@ void onBtnLongPressStop(int id)
     break;
   }
   case EVT_ENCBTNB:
-    pinMode(21, OUTPUT);
-    digitalWrite(21, LOW);
-    pinMode(36, INPUT);
-    esp_sleep_enable_ext0_wakeup((gpio_num_t)36, LOW);
-    pinMode(4, OUTPUT);
-    digitalWrite(4, LOW);
     break;
   case EVT_BTNMODE:
   {
@@ -518,16 +488,19 @@ void onBtnDuringLongPress(int id)
       break;
     }
     case EVT_BTNUP:
+    {
+      int nv = config.store.volume + EASY_VOLUME_STEP;
+      if (nv > VOLUME_MAX)
+        nv = VOLUME_MAX;
+      player.setVol((uint8_t)nv);
+      break;
+    }
     case EVT_BTNDOWN:
     {
-      if (display.mode() == PLAYER)
-      {
-        display.putRequest(NEWMODE, STATIONS);
-      }
-      if (display.mode() == STATIONS)
-      {
-        controlsEvent(id == EVT_BTNDOWN);
-      }
+      int nv = config.store.volume - EASY_VOLUME_STEP;
+      if (nv < 0)
+        nv = 0;
+      player.setVol((uint8_t)nv);
       break;
     }
     default:
@@ -591,29 +564,6 @@ void onBtnClick(int id)
   case EVT_ENCBTNB:
   case EVT_ENC2BTNB:
   {
-    if (display.mode() == NUMBERS)
-    {
-      display.numOfNextStation = 0;
-      display.putRequest(NEWMODE, PLAYER);
-    }
-    if (display.mode() == PLAYER)
-    {
-      player.toggle();
-    }
-    if (display.mode() == STATIONS)
-    {
-      display.putRequest(NEWMODE, PLAYER);
-#ifdef DSP_LCD
-      delay(200);
-#endif
-      player.sendCommand({PR_PLAY, display.currentPlItem});
-    }
-    if (network.status == SOFT_AP || display.mode() == LOST)
-    {
-#ifdef USE_SD
-      config.changeMode();
-#endif
-    }
     break;
   }
   case EVT_BTNRIGHT:
@@ -622,30 +572,19 @@ void onBtnClick(int id)
     break;
   }
   case EVT_BTNUP:
+  {
+    int nv = config.store.volume + EASY_VOLUME_STEP;
+    if (nv > VOLUME_MAX)
+      nv = VOLUME_MAX;
+    player.setVol((uint8_t)nv);
+    break;
+  }
   case EVT_BTNDOWN:
   {
-    if (DSP_MODEL == DSP_DUMMY)
-    {
-      if (id == EVT_BTNUP)
-      {
-        player.next();
-      }
-      else
-      {
-        player.prev();
-      }
-    }
-    else
-    {
-      if (display.mode() == PLAYER)
-      {
-        display.putRequest(NEWMODE, STATIONS);
-      }
-      if (display.mode() == STATIONS)
-      {
-        controlsEvent(id == EVT_BTNDOWN);
-      }
-    }
+    int nv = config.store.volume - EASY_VOLUME_STEP;
+    if (nv < 0)
+      nv = 0;
+    player.setVol((uint8_t)nv);
     break;
   }
 #ifdef USE_SD
@@ -677,8 +616,6 @@ void onBtnDoubleClick(int id)
   case EVT_ENCBTNB:
   case EVT_ENC2BTNB:
   {
-    // display.putRequest(NEWMODE, display.mode() == PLAYER ? VOL : PLAYER);
-    onBtnClick(EVT_BTNMODE);
     break;
   }
   case EVT_BTNRIGHT:

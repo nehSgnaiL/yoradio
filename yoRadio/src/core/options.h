@@ -192,6 +192,24 @@ The connection tables are located here https://github.com/e2002/yoradio#connecti
 #ifndef BTN_PRESS_TICKS
   #define BTN_PRESS_TICKS    500
 #endif
+#ifndef EASY_VOLUME_STEP
+  #define EASY_VOLUME_STEP         10
+#endif
+#ifndef DEFAULT_VOLUME_LEVEL
+  #define DEFAULT_VOLUME_LEVEL    170
+#endif
+#ifndef LOW_BATTERY_THRESHOLD
+  #define LOW_BATTERY_THRESHOLD  3.55f
+#endif
+#ifndef LOW_BATTERY_BEEP_INTERVAL_MS
+  #define LOW_BATTERY_BEEP_INTERVAL_MS  60000UL
+#endif
+#ifndef LOW_BATTERY_BEEP_PIN
+  #define LOW_BATTERY_BEEP_PIN    255
+#endif
+#ifndef BAT_PWR_PIN
+  #define BAT_PWR_PIN               4
+#endif
 
 /*        TOUCH SCREEN            */
 #define TS_MODEL_UNDEFINED      0
@@ -447,7 +465,7 @@ The connection tables are located here https://github.com/e2002/yoradio#connecti
 #endif
 
 #define EN  1
-#define RU  2
+#define ZH  2
 #ifndef L10N_LANGUAGE
   #define L10N_LANGUAGE EN
 #endif

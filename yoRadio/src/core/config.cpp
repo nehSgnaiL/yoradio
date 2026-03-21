@@ -6,6 +6,7 @@
 #include "network.h"
 #include "netserver.h"
 #include "spidog.h"
+#include "options.h"
 
 Config config;
 
@@ -414,7 +415,7 @@ template <class T> int Config::eepromRead(int ee, T& value) {
 
 void Config::setDefaults() {
   store.config_set = 4262;
-  store.volume = 12;
+  store.volume = DEFAULT_VOLUME_LEVEL;
   store.balance = 0;
   store.trebble = 0;
   store.middle = 0;
@@ -939,4 +940,3 @@ void Config::bootInfo() {
   if(SDC_CS!=255) BOOTLOG("SD:\t\t%d", SDC_CS);
   BOOTLOG("------------------------------------------------");
 }
-
