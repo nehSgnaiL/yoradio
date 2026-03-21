@@ -45,13 +45,18 @@ Default volume: **170** (range 0–254).
 
 ## Flashing / 烧录固件
 
-1. Install [Arduino IDE](https://www.arduino.cc/en/software) or [PlatformIO](https://platformio.org/).
-2. Add ESP32 board support (Espressif ESP32 Arduino core ≥ 2.x).
-3. Install dependencies listed in the main [README](README.md#dependencies).
-4. Open `yoRadio/yoRadio.ino`.
-5. Select board **ESP32 Dev Module**, partition scheme **Huge APP (3MB No OTA)** or larger.
-6. Upload sketch.
-7. Upload SPIFFS data folder (`yoRadio/data/`) with **ESP32 Sketch Data Upload** tool.
+We use **Visual Studio Code** with the **PlatformIO IDE** extension. The `yoRadio/platformio.ini` already contains the correct board, partition, and library settings, so no manual configuration is needed.
+
+### Steps / 步骤
+
+1. Install [Visual Studio Code](https://code.visualstudio.com/).
+2. Open VS Code → **View → Extensions** → search **PlatformIO IDE** → Install.
+3. Open the `yoRadio` folder in VS Code (**File → Open Folder…** → select `yoRadio/`).  
+   PlatformIO will auto-detect `platformio.ini` and install all dependencies.
+4. Edit `V5Aconfig.h` if you need to change any defaults before flashing.
+5. In the PlatformIO toolbar at the bottom of VS Code, click **→ Upload** to compile and flash the firmware.
+6. Upload the web data folder: open the PlatformIO sidebar → **Project Tasks → Upload Filesystem Image** to flash `yoRadio/data/` via SPIFFS.
+7. After flashing, click **Serial Monitor** in the PlatformIO toolbar to confirm boot and get the Wi-Fi IP address.
 
 ---
 
