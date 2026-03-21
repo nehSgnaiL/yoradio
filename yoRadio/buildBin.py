@@ -25,8 +25,10 @@ def after_build(source, target, env):
             esptool_script = candidate
 
     cmd = [env.subst("$PYTHONEXE")]
+    esptool_mode = "module"
     if esptool_script:
         cmd.append(esptool_script)
+        esptool_mode = "platformio-tool"
     else:
         cmd.extend(["-m", "esptool"])
 
@@ -40,7 +42,14 @@ def after_build(source, target, env):
         "0x10000", os.path.join(build_dir, "firmware.bin"),
     ])
 
-    subprocess.check_call(cmd)
+    print("Merging firmware with esptool mode:", esptool_mode)
+    try:
+        subprocess.check_call(cmd)
+    except subprocess.CalledProcessError as exc:
+        raise RuntimeError(
+            "Failed to merge firmware binaries. "
+            f"esptool mode: {esptool_mode}, command: {' '.join(cmd)}"
+        ) from exc
     print("Merged BIN created:", merged)
 
 env.AddPostAction("$BUILD_DIR/${PROGNAME}.bin", after_build)
