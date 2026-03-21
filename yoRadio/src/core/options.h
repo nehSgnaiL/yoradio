@@ -196,7 +196,7 @@ The connection tables are located here https://github.com/e2002/yoradio#connecti
   #define EASY_VOLUME_STEP         10
 #endif
 #ifndef DEFAULT_VOLUME_LEVEL
-  #define DEFAULT_VOLUME_LEVEL    170
+  #define DEFAULT_VOLUME_LEVEL    190
 #endif
 #ifndef FORCE_DEFAULT_VOLUME_ON_START
   #define FORCE_DEFAULT_VOLUME_ON_START  true
