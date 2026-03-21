@@ -56,8 +56,10 @@ We use **Visual Studio Code** with the **PlatformIO IDE** extension. The `yoRadi
 4. Edit `V5Aconfig.h` if you need to change any defaults before flashing.
 5. In the PlatformIO toolbar at the bottom of VS Code, click **→ Upload** to compile and flash the firmware.
 6. Upload the web data folder: open the PlatformIO sidebar → **Project Tasks → Upload Filesystem Image**.  
-   This task automatically builds and uploads `yoRadio/data/` to SPIFFS — no extra SPIFFS/data setting is needed.
-7. After flashing, click **Serial Monitor** in the PlatformIO toolbar to confirm boot and get the Wi-Fi IP address.
+   This task automatically builds and uploads `yoRadio/data/` to SPIFFS — no extra SPIFFS/data setting is needed.  
+   Note: this upload step requires a connected ESP32 serial device. For CI/build-only checks, use **Build Filesystem Image** (`platformio run --target buildfs --environment esp32dev`).
+7. After flashing, click **Serial Monitor** in the PlatformIO toolbar (**115200 baud**) to confirm boot and get the Wi-Fi IP address.  
+   If the monitor opens but shows nothing, press the ESP32 **EN/RESET** button once (or power-cycle the board) to print fresh boot logs.
 
 ---
 
