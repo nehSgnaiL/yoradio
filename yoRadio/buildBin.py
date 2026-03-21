@@ -17,8 +17,20 @@ def after_build(source, target, env):
     merged = os.path.join(build_dir, "merged-yoradio.bin")
     boot_app0 = _boot_app0_path(build_dir, env)
 
-    cmd = [
-        "uv", "run", "python", "-m", "esptool",
+    esptool_script = None
+    esptool_pkg = env.PioPlatform().get_package_dir("tool-esptoolpy")
+    if esptool_pkg:
+        candidate = os.path.join(esptool_pkg, "esptool.py")
+        if os.path.exists(candidate):
+            esptool_script = candidate
+
+    cmd = [env.subst("$PYTHONEXE")]
+    if esptool_script:
+        cmd.append(esptool_script)
+    else:
+        cmd.extend(["-m", "esptool"])
+
+    cmd.extend([
         "--chip", "esp32",
         "merge_bin",
         "-o", merged,
@@ -26,7 +38,7 @@ def after_build(source, target, env):
         "0x8000", os.path.join(build_dir, "partitions.bin"),
         "0xe000", boot_app0,
         "0x10000", os.path.join(build_dir, "firmware.bin"),
-    ]
+    ])
 
     subprocess.check_call(cmd)
     print("Merged BIN created:", merged)
