@@ -104,9 +104,9 @@ void setup()
   digitalWrite(SYSTEM_PWR_PIN, HIGH);
   setCpuFrequencyMhz(240);
   adc1_config_width(ADC_WIDTH_BIT_12);
-  adc1_config_channel_atten(BATT_ADC, ADC_ATTEN_DB_11);
+  adc1_config_channel_atten(BATT_ADC, ADC_ATTEN_DB_12);
   adcChar = (esp_adc_cal_characteristics_t *)calloc(1, sizeof(esp_adc_cal_characteristics_t));
-  esp_adc_cal_value_t cal_mode = esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_11, ADC_WIDTH_BIT_12, 1100, adcChar);
+  esp_adc_cal_value_t cal_mode = esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_12, ADC_WIDTH_BIT_12, 1100, adcChar);
   if (LED_BUILTIN != 255)
     pinMode(LED_BUILTIN, OUTPUT);
   if (yoradio_on_setup)
