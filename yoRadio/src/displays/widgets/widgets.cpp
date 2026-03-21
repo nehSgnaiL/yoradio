@@ -8,6 +8,9 @@
 #include "../../core/config.h"
 #include "../tools/l10n.h"
 #include "../tools/psframebuffer.h"
+#if defined(V5A_USE_CHINESE_FONT) && V5A_USE_CHINESE_FONT
+#include <U8g2_for_Adafruit_GFX.h>
+#endif
 
 /************************
       FILL WIDGET
@@ -942,13 +945,28 @@ void PlayListWidget::drawPlaylist(uint16_t currentItem) {
 void PlayListWidget::_printPLitem(uint8_t pos, const char* item){
   dsp.setTextSize(playlistConf.widget.textsize);
   if (pos == _plCurrentPos) {
+#if defined(V5A_USE_CHINESE_FONT) && V5A_USE_CHINESE_FONT
+    if (_currentCHS) {
+      dsp.fillRect(0, _plYStart + pos * _plItemHeight - 1, dsp.width(), _plItemHeight + 1, config.theme.background);
+      _currentCHS->setText(item);
+    } else {
+      _current->setText(item);
+    }
+#else
     _current->setText(item);
+#endif
   } else {
     uint8_t plColor = (abs(pos - _plCurrentPos)-1)>4?4:abs(pos - _plCurrentPos)-1;
+    dsp.fillRect(0, _plYStart + pos * _plItemHeight - 1, dsp.width(), _plItemHeight + 1, config.theme.background);
+#if defined(V5A_USE_CHINESE_FONT) && V5A_USE_CHINESE_FONT
+    u8g2_for_adafruit_gfx.setBackgroundColor(config.theme.background);
+    u8g2_for_adafruit_gfx.setForegroundColor(config.theme.playlist[plColor]);
+    u8g2_for_adafruit_gfx.drawUTF8(TFT_FRAMEWDT, _plYStart + pos * _plItemHeight + 16, item);
+#else
     dsp.setTextColor(config.theme.playlist[plColor], config.theme.background);
     dsp.setCursor(TFT_FRAMEWDT, _plYStart + pos * _plItemHeight);
-    dsp.fillRect(0, _plYStart + pos * _plItemHeight - 1, dsp.width(), _plItemHeight - 2, config.theme.background);
     dsp.print(utf8Rus(item, true));
+#endif
   }
 }
 #else
@@ -971,5 +989,144 @@ void PlayListWidget::drawPlaylist(uint16_t currentItem) {
 }
 #endif
 
+#if defined(V5A_USE_CHINESE_FONT) && V5A_USE_CHINESE_FONT
+/**************************
+  PLAYLIST WIDGET - CHS initCHS
+ **************************/
+void PlayListWidget::initCHS(ScrollWidgetCHS* current){
+  Widget::init({0, 0, 0, WA_LEFT}, 0, 0);
+  _current = nullptr;
+  _currentCHS = current;
+  #ifndef DSP_LCD
+  /* Use fixed item height of 32px to fit 18px Chinese font with padding */
+  _plItemHeight = 32;
+  _plTtemsCount = round((float)dsp.height()/_plItemHeight);
+  if(_plTtemsCount%2==0) _plTtemsCount++;
+  _plCurrentPos = _plTtemsCount/2;
+  _plYStart = (dsp.height() / 2 - _plItemHeight / 2) - _plItemHeight * (_plTtemsCount - 1) / 2 + playlistConf.widget.textsize*2;
+  #else
+  _plTtemsCount = PLMITEMS;
+  _plCurrentPos = 1;
+  #endif
+}
 
-#endif // #if DSP_MODEL!=DSP_DUMMY
+/**************************
+  SCROLL WIDGET CHS (Chinese/UTF-8)
+ **************************/
+ScrollWidgetCHS::ScrollWidgetCHS(const char* separator, ScrollConfig conf, uint16_t fgcolor, uint16_t bgcolor){
+  init(separator, conf, fgcolor, bgcolor);
+}
+
+ScrollWidgetCHS::~ScrollWidgetCHS(){
+  free(_sep);
+  free(_window);
+}
+
+void ScrollWidgetCHS::init(const char* separator, ScrollConfig conf, uint16_t fgcolor, uint16_t bgcolor){
+  TextWidget::init(conf.widget, conf.buffsize, conf.uppercase, fgcolor, bgcolor);
+  _sep = (char*)malloc(sizeof(char) * 4);
+  memset(_sep, 0, 4);
+  snprintf(_sep, 4, " %.*s ", 1, separator);
+  _x = conf.widget.left;
+  _startscrolldelay = conf.startscrolldelay;
+  _scrolldelta = conf.scrolldelta;
+  _scrolltime = conf.scrolltime;
+  /* Each Chinese character is rendered at 18px wide via U8g2 font */
+  _charWidth = 18;
+  _textheight = 32;
+  _sepwidth = strlen(_sep) * _charWidth;
+  _width = conf.width;
+  _window = (char*)malloc(sizeof(char) * (conf.buffsize + 1));
+  memset(_window, 0, conf.buffsize + 1);
+  _doscroll = false;
+}
+
+void ScrollWidgetCHS::_setTextParams(){
+  /* Colors set directly via u8g2 in _draw() */
+}
+
+bool ScrollWidgetCHS::_checkIsScrollNeeded(){
+  return _textwidth > _width;
+}
+
+void ScrollWidgetCHS::setText(const char* txt){
+  strlcpy(_text, txt, _buffsize - 1);
+  if (strcmp(_oldtext, _text) == 0) return;
+  _textwidth = strlen(_text) * _charWidth;
+  _x = _config.left;
+  _doscroll = _checkIsScrollNeeded();
+  if (dsp.getScrollId() == this) dsp.setScrollId(NULL);
+  _scrolldelay = millis();
+  if (_active) {
+    if (_doscroll)
+      _clear();
+    _draw();
+  }
+  strlcpy(_oldtext, _text, _buffsize);
+}
+
+void ScrollWidgetCHS::setText(const char* txt, const char* format){
+  char buf[_buffsize];
+  snprintf(buf, _buffsize, format, txt);
+  setText(buf);
+}
+
+void ScrollWidgetCHS::_clear(){
+  dsp.fillRect(_config.left, _config.top, _width, _textheight, _bgcolor);
+}
+
+void ScrollWidgetCHS::_draw(){
+  if (!_active || _locked) return;
+  dsp.fillRect(_config.left - 8, _config.top - 10, _width + 8, _textheight, _bgcolor);
+  u8g2_for_adafruit_gfx.setBackgroundColor(_bgcolor);
+  u8g2_for_adafruit_gfx.setForegroundColor(_fgcolor);
+  if (_doscroll) {
+    uint16_t _newx = _config.left - _x;
+    const char* _cursor = _text + _newx / _charWidth;
+    uint16_t hiddenChars = _cursor - _text;
+    if (hiddenChars < strlen(_text)) {
+      snprintf(_window, _width / _charWidth + 1, "%s%s%s", _cursor, _sep, _text);
+    } else {
+      const char* _scursor = _sep + (_cursor - (_text + strlen(_text)));
+      snprintf(_window, _width / _charWidth + 1, "%s%s", _scursor, _text);
+    }
+    u8g2_for_adafruit_gfx.drawUTF8(_x + (int16_t)(hiddenChars * _charWidth), _config.top + 18, _window);
+  } else {
+    u8g2_for_adafruit_gfx.drawUTF8(_realLeft(), _config.top + 18, _text);
+  }
+}
+
+void ScrollWidgetCHS::_calcX(){
+  if (!_doscroll || _config.textsize == 0) return;
+  _x -= _scrolldelta;
+  if (-_x > (int16_t)(_textwidth + _sepwidth - _config.left)) {
+    _x = _config.left;
+    dsp.setScrollId(NULL);
+  } else {
+    dsp.setScrollId(this);
+  }
+}
+
+bool ScrollWidgetCHS::_checkDelay(int m, uint32_t& tstamp){
+  if (millis() - tstamp > (uint32_t)m) {
+    tstamp = millis();
+    return true;
+  }
+  return false;
+}
+
+void ScrollWidgetCHS::loop(){
+  if (_locked) return;
+  if (!_doscroll || _config.textsize == 0 || (dsp.getScrollId() != NULL && dsp.getScrollId() != this)) return;
+  if (_checkDelay(_x == _config.left ? _startscrolldelay : _scrolltime, _scrolldelay)) {
+    _calcX();
+    if (_active) _draw();
+  }
+}
+
+void ScrollWidgetCHS::_reset(){
+  dsp.setScrollId(NULL);
+  _x = _config.left;
+  _scrolldelay = millis();
+}
+#endif /* V5A_USE_CHINESE_FONT */

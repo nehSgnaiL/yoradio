@@ -94,6 +94,9 @@ Display::~Display() {
   delete _title1;
   delete _title2;
   delete _plcurrent;
+#if defined(V5A_USE_CHINESE_FONT) && V5A_USE_CHINESE_FONT
+  delete _plcurrentCHS;
+#endif
 }
 
 void Display::init() {
@@ -121,6 +124,9 @@ void Display::init() {
   _meta = new ScrollWidget();
   _title1 = new ScrollWidget();
   _plcurrent = new ScrollWidget();
+#if defined(V5A_USE_CHINESE_FONT) && V5A_USE_CHINESE_FONT
+  _plcurrentCHS = new ScrollWidgetCHS();
+#endif
   Serial.println("done");
 }
 
@@ -161,7 +167,12 @@ void Display::_buildPager(){
   #else
     _plcurrent->init("*", playlistConf, config.theme.plcurrent, config.theme.plcurrentbg);
   #endif
+#if defined(V5A_USE_CHINESE_FONT) && V5A_USE_CHINESE_FONT
+  _plcurrentCHS->init("*", playlistConf, config.theme.plcurrent, config.theme.plcurrentbg);
+  _plwidget->initCHS(_plcurrentCHS);
+#else
   _plwidget->init(_plcurrent);
+#endif
   #if !defined(DSP_LCD)
     _plcurrent->moveTo({TFT_FRAMEWDT, (uint16_t)(_plwidget->currentTop()), (int16_t)playlistConf.width});
   #endif
@@ -241,6 +252,9 @@ void Display::_buildPager(){
   }
   #endif
   pages[PG_PLAYLIST]->addWidget(_plcurrent);
+#if defined(V5A_USE_CHINESE_FONT) && V5A_USE_CHINESE_FONT
+  pages[PG_PLAYLIST]->addWidget(_plcurrentCHS);
+#endif
   pages[PG_PLAYLIST]->addWidget(_plwidget);
   for(const auto& p: pages) _pager->addPage(p);
 }

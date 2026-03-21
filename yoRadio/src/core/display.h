@@ -18,6 +18,9 @@ class VuWidget;
 class NumWidget;
 class ClockWidget;
 class TextWidget;
+#if defined(V5A_USE_CHINESE_FONT) && V5A_USE_CHINESE_FONT
+class ScrollWidgetCHS;
+#endif
     
 class Display {
   public:
@@ -46,6 +49,9 @@ class Display {
     uint16_t height();
   private:
     ScrollWidget *_meta, *_title1, *_plcurrent, *_weather, *_title2;
+#if defined(V5A_USE_CHINESE_FONT) && V5A_USE_CHINESE_FONT
+    ScrollWidgetCHS *_plcurrentCHS = nullptr;
+#endif
     PlayListWidget *_plwidget;
     BitrateWidget *_fullbitrate;
     FillWidget *_metabackground, *_plbackground;

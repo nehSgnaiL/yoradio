@@ -25,7 +25,12 @@
 #endif
 
 #if DSP_HSPI || TS_HSPI || VS_HSPI
+/* V5A uses VSPI hardware bus; all other boards default to HSPI */
+#if defined(V5A_USE_VSPI) && V5A_USE_VSPI
+SPIClass  SPI2(VSPI);
+#else
 SPIClass  SPI2(HSPI);
+#endif
 #endif
 
 extern __attribute__((weak)) void yoradio_on_setup();

@@ -32,4 +32,9 @@ typedef Adafruit_ST7789 yoDisplay;
   #endif
 #endif
 
+#if defined(V5A_USE_CHINESE_FONT) && V5A_USE_CHINESE_FONT
+#include <U8g2_for_Adafruit_GFX.h>
+extern U8G2_FOR_ADAFRUIT_GFX u8g2_for_adafruit_gfx;
+#endif
+
 #endif

@@ -9,6 +9,11 @@ DspCore::DspCore(): Adafruit_ST7789(&SPI2, TFT_CS, TFT_DC, TFT_RST) {}
 DspCore::DspCore(): Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST) {}
 #endif
 
+#if defined(V5A_USE_CHINESE_FONT) && V5A_USE_CHINESE_FONT
+#include "../fonts/u8g2_mfyuehei_18_gb2312.h"
+U8G2_FOR_ADAFRUIT_GFX u8g2_for_adafruit_gfx;
+#endif
+
 void DspCore::initDisplay() {
   if(DSP_MODEL==DSP_ST7789_76){
     init(76,284);
@@ -23,6 +28,10 @@ void DspCore::initDisplay() {
   setTextWrap(false);
   setTextSize(1);
   fillScreen(0x0000);
+#if defined(V5A_USE_CHINESE_FONT) && V5A_USE_CHINESE_FONT
+  u8g2_for_adafruit_gfx.begin(*this);
+  u8g2_for_adafruit_gfx.setFont(u8g2_mfyuehei_18_gb2312);
+#endif
 }
 
 void DspCore::clearDsp(bool black){ fillScreen(black?0:config.theme.background); }
