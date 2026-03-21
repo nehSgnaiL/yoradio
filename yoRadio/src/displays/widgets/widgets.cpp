@@ -1130,3 +1130,4 @@ void ScrollWidgetCHS::_reset(){
   _scrolldelay = millis();
 }
 #endif /* V5A_USE_CHINESE_FONT */
+#endif /* DSP_MODEL!=DSP_DUMMY */
