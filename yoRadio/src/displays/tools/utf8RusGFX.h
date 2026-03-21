@@ -6,6 +6,7 @@ char* DspCore::utf8Rus(const char* str, bool uppercase) {
   static char strn[BUFLEN];
   bool E = false;
   strlcpy(strn, str, BUFLEN);
+  if (L10N_LANGUAGE == ZH) return strn; // Chinese UTF-8 text does not need Cyrillic remapping/case tweaks
   if (uppercase) {
     bool next = false;
     for (char *iter = strn; *iter != '\0'; ++iter)

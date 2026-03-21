@@ -34,6 +34,7 @@
 extern __attribute__((weak)) void yoradio_on_setup();
 #ifdef BATT_ADC
 static esp_adc_cal_characteristics_t *adcChar;
+static unsigned long lastLowBatteryBeep = 0;
 
 float LastBATVoltage[10] = {0, 0, 0, 0, 0};
 int LastBATVoltageCount = 0;
@@ -43,7 +44,7 @@ float GetBATVoltage()
   uint32_t readRaw;
   uint32_t read_voltage;
   float retr;
-  readRaw = adc1_get_raw(ADC1_CHANNEL_3);
+  readRaw = adc1_get_raw(BATT_ADC);
   read_voltage = esp_adc_cal_raw_to_voltage(readRaw, adcChar);
   retr = read_voltage;
   retr /= 1000;
@@ -70,19 +71,40 @@ float GetBATVoltage()
 
   return retr;
 }
+
+void lowBatteryBeep()
+{
+#if LOW_BATTERY_BEEP_PIN != 255
+  ledcAttachPin(LOW_BATTERY_BEEP_PIN, LOW_BATTERY_BEEP_CHANNEL);
+  const uint16_t tones[] = {
+    LOW_BATTERY_BEEP_TONE_HIGH,
+    LOW_BATTERY_BEEP_TONE_LOW,
+    LOW_BATTERY_BEEP_TONE_HIGH,
+    LOW_BATTERY_BEEP_TONE_LOW
+  };
+  for (uint8_t i = 0; i < 4; i++)
+  {
+    ledcWriteTone(LOW_BATTERY_BEEP_CHANNEL, tones[i]);
+    delay(LOW_BATTERY_BEEP_ON_MS);
+    ledcWriteTone(LOW_BATTERY_BEEP_CHANNEL, 0);
+    delay(LOW_BATTERY_BEEP_OFF_MS);
+  }
+  ledcDetachPin(LOW_BATTERY_BEEP_PIN);
+#endif
+}
 #endif
 void setup()
 {
   Serial.begin(115200);
   WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
 
-  pinMode(4, OUTPUT);
-  digitalWrite(4, HIGH);
-  pinMode(2, OUTPUT);
-  digitalWrite(2, HIGH);
+  pinMode(BAT_PWR_PIN, OUTPUT);
+  digitalWrite(BAT_PWR_PIN, HIGH);
+  pinMode(SYSTEM_PWR_PIN, OUTPUT);
+  digitalWrite(SYSTEM_PWR_PIN, HIGH);
   setCpuFrequencyMhz(240);
   adc1_config_width(ADC_WIDTH_BIT_12);
-  adc1_config_channel_atten(ADC1_CHANNEL_3, ADC_ATTEN_DB_11);
+  adc1_config_channel_atten(BATT_ADC, ADC_ATTEN_DB_11);
   adcChar = (esp_adc_cal_characteristics_t *)calloc(1, sizeof(esp_adc_cal_characteristics_t));
   esp_adc_cal_value_t cal_mode = esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_11, ADC_WIDTH_BIT_12, 1100, adcChar);
   if (LED_BUILTIN != 255)
@@ -127,6 +149,16 @@ void setup()
 void loop()
 {
   telnet.loop();
+#ifdef BATT_ADC
+  if ((unsigned long)(millis() - lastLowBatteryBeep) > LOW_BATTERY_BEEP_INTERVAL_MS)
+  {
+    lastLowBatteryBeep = millis();
+    if (GetBATVoltage() <= LOW_BATTERY_THRESHOLD)
+    {
+      lowBatteryBeep();
+    }
+  }
+#endif
   if (network.status == CONNECTED || network.status == SDREADY)
   {
     player.loop();

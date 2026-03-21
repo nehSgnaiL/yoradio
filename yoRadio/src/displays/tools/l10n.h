@@ -2,8 +2,8 @@
 #define _display_l10n_h
 
 //==================================================
-#if L10N_LANGUAGE==RU
-  #define L10N_PATH "../../../locale/displayL10n_ru.h"
+#if L10N_LANGUAGE==ZH
+  #define L10N_PATH "../../../locale/displayL10n_zh.h"
 #else
   #define L10N_PATH "../../../locale/displayL10n_en.h"
 #endif

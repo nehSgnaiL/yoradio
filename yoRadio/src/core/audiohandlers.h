@@ -39,14 +39,8 @@ void audio_bitrate(const char *info)
 }
 
 bool printable(const char *info) {
-  if(L10N_LANGUAGE!=RU) return true;
-  bool p = true;
-  for (int c = 0; c < strlen(info); c++)
-  {
-    if ((uint8_t)info[c] > 0x7e || (uint8_t)info[c] < 0x20) p = false;
-  }
-  if (!p) p = (uint8_t)info[0] >= 0xC2 && (uint8_t)info[1] >= 0x80 && (uint8_t)info[1] <= 0xBF;
-  return p;
+  (void)info;
+  return true;
 }
 
 void audio_showstation(const char *info) {
