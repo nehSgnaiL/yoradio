@@ -40,7 +40,7 @@
 
 /*        BATTERY                  */
 #ifndef BAT_OWR
-  #define BAT_OWR               255   // keep system power enabled when battery is connected
+  #define BAT_OWR               4     // V5A power-hold pin: drive HIGH at boot to keep system powered
 #endif
 #ifndef BAT_LOW_ADC
   #define BAT_LOW_ADC           255   // ADC pin for battery low check

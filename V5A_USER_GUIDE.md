@@ -55,7 +55,8 @@ We use **Visual Studio Code** with the **PlatformIO IDE** extension. The `yoRadi
    PlatformIO will auto-detect `platformio.ini` and install all dependencies.
 4. Edit `V5Aconfig.h` if you need to change any defaults before flashing.
 5. In the PlatformIO toolbar at the bottom of VS Code, click **→ Upload** to compile and flash the firmware.
-6. Upload the web data folder: open the PlatformIO sidebar → **Project Tasks → Upload Filesystem Image** to flash `yoRadio/data/` via SPIFFS.
+6. Upload the web data folder: open the PlatformIO sidebar → **Project Tasks → Upload Filesystem Image**.  
+   This task automatically builds and uploads `yoRadio/data/` to SPIFFS — no extra SPIFFS/data setting is needed.
 7. After flashing, click **Serial Monitor** in the PlatformIO toolbar to confirm boot and get the Wi-Fi IP address.
 
 ---
@@ -75,6 +76,7 @@ Edit that file before compiling — no other files need touching.
 | `V5A_USE_VSPI` | `true` | Use VSPI hardware bus |
 | `V5A_USE_CHINESE_FONT` | `true` | Enable U8g2 GB2312 font rendering |
 | `V5A_DEFAULT_TZ_HOUR` | `8` | Timezone offset (CST = UTC+8) |
+| `BAT_OWR` | `4` | V5A power-hold pin (kept HIGH at boot) |
 
 ---
 
